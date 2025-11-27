@@ -1,0 +1,1821 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced 3D Geometry - Grade 10</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #4c1d95 100%);
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .main-container {
+      width: 100%;
+      min-height: 100%;
+      padding: 60px 20px;
+    }
+
+    .hero-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 60px;
+      padding: 0 20px;
+    }
+
+    .hero-header h1 {
+      font-size: 64px;
+      margin: 0 0 20px 0;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      letter-spacing: -2px;
+    }
+
+    .hero-header p {
+      font-size: 24px;
+      margin: 0;
+      opacity: 0.9;
+      font-weight: 400;
+      color: #e2e8f0;
+    }
+
+    .content-grid {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .tab-navigation {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 50px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shapes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 35px;
+      margin-bottom: 40px;
+    }
+
+    .shape-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .shape-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .shape-card:hover {
+      transform: translateY(-15px) scale(1.03);
+      box-shadow: 0 30px 70px rgba(102, 126, 234, 0.4);
+    }
+
+    .shape-card:hover::before {
+      opacity: 1;
+    }
+
+    .shape-visual {
+      width: 100%;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      position: relative;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.05), transparent);
+    }
+
+    .shape-name {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1e293b;
+      text-align: center;
+      margin-bottom: 25px;
+      letter-spacing: -0.5px;
+    }
+
+    .properties-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .property-box {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 15px;
+      border-radius: 14px;
+      text-align: center;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .property-box:hover {
+      border-color: #667eea;
+      transform: scale(1.05);
+    }
+
+    .property-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .property-value {
+      font-size: 28px;
+      color: #667eea;
+      font-weight: 800;
+    }
+
+    .formulas-section {
+      background: linear-gradient(135deg, #f1f5f9, #e0e7ff);
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 20px;
+      border: 2px solid #c7d2fe;
+    }
+
+    .formula-title {
+      font-size: 16px;
+      color: #4338ca;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .formula-item {
+      background: white;
+      border-left: 5px solid #667eea;
+      padding: 15px 20px;
+      margin: 12px 0;
+      border-radius: 10px;
+      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+      font-size: 16px;
+      color: #1e293b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .formula-item:hover {
+      transform: translateX(8px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .formula-label {
+      color: #667eea;
+      font-weight: 800;
+      margin-right: 10px;
+    }
+
+    .key-fact {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-left: 5px solid #f59e0b;
+      padding: 15px 20px;
+      margin: 15px 0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .calculator-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 50px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      max-width: 900px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .calculator-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .calculator-header h2 {
+      font-size: 42px;
+      color: #1e293b;
+      margin: 0 0 15px 0;
+      font-weight: 800;
+    }
+
+    .calculator-form {
+      display: grid;
+      gap: 25px;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-select, .form-input {
+      padding: 18px 20px;
+      border: 3px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .calc-button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 22px 40px;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .calc-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .calc-result {
+      margin-top: 30px;
+      padding: 30px;
+      background: linear-gradient(135deg, #e0f2fe, #ddd6fe);
+      border-radius: 16px;
+      border: 3px solid #667eea;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 50px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      max-width: 1000px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .quiz-header h2 {
+      font-size: 48px;
+      color: #1e293b;
+      margin: 0 0 20px 0;
+      font-weight: 800;
+    }
+
+    .quiz-start-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .quiz-start-screen h3 {
+      font-size: 32px;
+      color: #475569;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .quiz-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin: 40px 0;
+    }
+
+    .feature-box {
+      background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+      padding: 30px;
+      border-radius: 16px;
+      border: 2px solid #c7d2fe;
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .feature-text {
+      font-size: 16px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .start-quiz-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 24px 60px;
+      font-size: 24px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .start-quiz-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.5);
+    }
+
+    .quiz-progress-bar {
+      background: #e2e8f0;
+      height: 12px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .quiz-progress-fill {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      transition: width 0.5s ease;
+      border-radius: 20px;
+    }
+
+    .quiz-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .question-counter {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+      background: #e0e7ff;
+      padding: 12px 25px;
+      border-radius: 25px;
+    }
+
+    .score-display {
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+      background: #d1fae5;
+      padding: 12px 25px;
+      border-radius: 25px;
+    }
+
+    .difficulty-badge {
+      font-size: 16px;
+      font-weight: 700;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .difficulty-easy {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .difficulty-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .difficulty-hard {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      padding: 40px;
+      border-radius: 20px;
+      margin-bottom: 35px;
+      border: 3px solid #e2e8f0;
+    }
+
+    .question-text {
+      font-size: 26px;
+      color: #1e293b;
+      line-height: 1.7;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .question-context {
+      font-size: 16px;
+      color: #64748b;
+      margin-top: 15px;
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 35px;
+    }
+
+    .option-card {
+      background: white;
+      border: 4px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 25px 30px;
+      font-size: 20px;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .option-letter {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .option-card:hover:not(.correct):not(.incorrect):not(.disabled) {
+      background: #f8fafc;
+      border-color: #667eea;
+      transform: translateX(10px);
+    }
+
+    .option-card.correct {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .option-card.correct .option-letter {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .option-card.incorrect {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .option-card.incorrect .option-letter {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .option-card.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .feedback-box {
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.6;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+    }
+
+    .feedback-box.correct {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border: 3px solid #10b981;
+      color: #065f46;
+    }
+
+    .feedback-box.incorrect {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border: 3px solid #ef4444;
+      color: #991b1b;
+    }
+
+    .feedback-box.empty {
+      background: transparent;
+      border: none;
+    }
+
+    .quiz-actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .quiz-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 20px 50px;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .quiz-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .quiz-btn:disabled {
+      background: linear-gradient(135deg, #94a3b8, #64748b);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .quiz-btn.secondary {
+      background: linear-gradient(135deg, #64748b, #475569);
+    }
+
+    .results-screen {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .results-emoji {
+      font-size: 120px;
+      margin-bottom: 30px;
+      animation: bounce 1s ease infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0px); }
+      to { transform: translateY(-20px); }
+    }
+
+    .results-score {
+      font-size: 96px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 20px 0;
+      letter-spacing: -3px;
+    }
+
+    .results-message {
+      font-size: 36px;
+      color: #334155;
+      margin: 25px 0;
+      font-weight: 700;
+    }
+
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 25px;
+      margin: 50px 0;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+      padding: 30px;
+      border-radius: 20px;
+      border: 3px solid #c7d2fe;
+    }
+
+    .stat-value {
+      font-size: 52px;
+      font-weight: 900;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    @keyframes rotate3d {
+      from { transform: rotateY(0deg) rotateX(15deg); }
+      to { transform: rotateY(360deg) rotateX(15deg); }
+    }
+
+    .rotating {
+      animation: rotate3d 10s linear infinite;
+      transform-style: preserve-3d;
+    }
+
+    .resource-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .resource-card {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 25px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .resource-card:hover {
+      border-color: #667eea;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+    }
+
+    .resource-icon {
+      font-size: 48px;
+      flex-shrink: 0;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+      border-radius: 16px;
+      border: 2px solid #c7d2fe;
+    }
+
+    .resource-content {
+      flex: 1;
+    }
+
+    .resource-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 10px;
+    }
+
+    .resource-description {
+      font-size: 16px;
+      color: #64748b;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .resource-category {
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-header h1 {
+        font-size: 42px;
+      }
+      
+      .shapes-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .quiz-container, .calculator-container {
+        padding: 30px 20px;
+      }
+
+      .properties-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .resource-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <main class="main-container">
+   <header class="hero-header">
+    <h1 id="app-title">Advanced 3D Geometry</h1>
+    <p id="subtitle">Master Grade 10 concepts: Volume, Surface Area, and Spatial Reasoning</p>
+   </header>
+   <nav class="tab-navigation"><button class="tab-btn active" onclick="switchTab('shapes')">📚 Study Guide</button> <button class="tab-btn" onclick="switchTab('calculator')">🧮 Calculator</button> <button class="tab-btn" onclick="switchTab('quiz')">🎯 Assessment Quiz</button> <button class="tab-btn" onclick="switchTab('resources')">🔗 External Resources</button>
+   </nav>
+   <div class="content-grid"><!-- Shapes Study Guide Tab -->
+    <div id="shapes-tab" class="tab-content active">
+     <div class="shapes-grid" id="shapes-grid"></div>
+    </div><!-- Calculator Tab -->
+    <div id="calculator-tab" class="tab-content">
+     <div class="calculator-container">
+      <div class="calculator-header">
+       <h2 id="calculator-title">3D Shape Calculator</h2>
+       <p style="color: #64748b; font-size: 18px; font-weight: 500;">Calculate volume and surface area instantly</p>
+      </div>
+      <div class="calculator-form">
+       <div class="form-group"><label class="form-label">Select Shape</label> <select id="calc-shape" class="form-select"> <option value="">Choose a shape...</option> <option value="cube">Cube</option> <option value="sphere">Sphere</option> <option value="cylinder">Cylinder</option> <option value="cone">Cone</option> <option value="pyramid">Square Pyramid</option> <option value="prism">Triangular Prism</option> <option value="hemisphere">Hemisphere</option> <option value="rectangular">Rectangular Prism</option> </select>
+       </div>
+       <div id="calc-inputs" class="inputs-grid"></div><button class="calc-button" id="calculate-btn">Calculate</button>
+       <div class="calc-result" id="calc-result">
+        Select a shape and enter dimensions to calculate
+       </div>
+      </div>
+     </div>
+    </div><!-- Resources Tab -->
+    <div id="resources-tab" class="tab-content">
+     <div class="calculator-container">
+      <div class="calculator-header">
+       <h2 id="resources-title">External Learning Resources</h2>
+       <p style="color: #64748b; font-size: 18px; font-weight: 500;">Explore additional materials to deepen your understanding</p>
+      </div>
+      <div class="resources-grid" style="display: grid; gap: 25px;">
+       <div class="resource-category">
+        <h3 style="font-size: 28px; color: #667eea; margin-bottom: 25px; font-weight: 800; border-bottom: 3px solid #667eea; padding-bottom: 15px;">📹 Video Tutorials</h3>
+        <div style="display: grid; gap: 20px;"><a href="https://www.khanacademy.org/math/geometry/hs-geo-solids" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            🎓
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             Khan Academy - 3D Geometry
+            </div>
+            <div class="resource-description">
+             Comprehensive video lessons on volume, surface area, and 3D shapes with practice exercises
+            </div>
+           </div>
+          </div></a> <a href="https://www.youtube.com/results?search_query=grade+10+3d+shapes+volume+surface+area" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            📺
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             YouTube Math Tutorials
+            </div>
+            <div class="resource-description">
+             Curated search for Grade 10 3D geometry video explanations and worked examples
+            </div>
+           </div>
+          </div></a>
+        </div>
+       </div>
+       <div class="resource-category">
+        <h3 style="font-size: 28px; color: #10b981; margin-bottom: 25px; font-weight: 800; border-bottom: 3px solid #10b981; padding-bottom: 15px;">📝 Practice &amp; Worksheets</h3>
+        <div style="display: grid; gap: 20px;"><a href="https://www.mathsisfun.com/geometry/polyhedra.html" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            🎯
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             Math is Fun - Polyhedra
+            </div>
+            <div class="resource-description">
+             Interactive explanations, formulas, and examples for 3D shapes
+            </div>
+           </div>
+          </div></a> <a href="https://www.ixl.com/math/geometry" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            ✏️
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             IXL Math Practice
+            </div>
+            <div class="resource-description">
+             Interactive practice problems with instant feedback on 3D geometry concepts
+            </div>
+           </div>
+          </div></a>
+        </div>
+       </div>
+       <div class="resource-category">
+        <h3 style="font-size: 28px; color: #f59e0b; margin-bottom: 25px; font-weight: 800; border-bottom: 3px solid #f59e0b; padding-bottom: 15px;">🔬 Interactive Tools</h3>
+        <div style="display: grid; gap: 20px;"><a href="https://www.geogebra.org/m/mbvscas4" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            🧊
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             GeoGebra 3D Calculator
+            </div>
+            <div class="resource-description">
+             Visualize and manipulate 3D shapes interactively with powerful geometry software
+            </div>
+           </div>
+          </div></a> <a href="https://www.mathopenref.com/solids.html" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            📐
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             Math Open Reference - Solids
+            </div>
+            <div class="resource-description">
+             Interactive diagrams and calculators for all 3D geometric shapes
+            </div>
+           </div>
+          </div></a>
+        </div>
+       </div>
+       <div class="resource-category">
+        <h3 style="font-size: 28px; color: #ec4899; margin-bottom: 25px; font-weight: 800; border-bottom: 3px solid #ec4899; padding-bottom: 15px;">📚 Reference Materials</h3>
+        <div style="display: grid; gap: 20px;"><a href="https://www.mathplanet.com/education/geometry/solid-figures" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            📖
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             MathPlanet - Solid Figures
+            </div>
+            <div class="resource-description">
+             Detailed explanations of all formulas and concepts for 3D geometry
+            </div>
+           </div>
+          </div></a> <a href="https://www.purplemath.com/modules/volume.htm" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            🔍
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             Purplemath - Volume Formulas
+            </div>
+            <div class="resource-description">
+             Step-by-step guides for calculating volume and surface area
+            </div>
+           </div>
+          </div></a> <a href="https://en.wikipedia.org/wiki/List_of_formulas_in_elementary_geometry#3D_objects" target="_blank" rel="noopener noreferrer" class="resource-link">
+          <div class="resource-card">
+           <div class="resource-icon">
+            📊
+           </div>
+           <div class="resource-content">
+            <div class="resource-title">
+             Wikipedia - 3D Geometry Formulas
+            </div>
+            <div class="resource-description">
+             Comprehensive reference list of all 3D shape formulas and properties
+            </div>
+           </div>
+          </div></a>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Quiz Tab -->
+    <div id="quiz-tab" class="tab-content">
+     <div class="quiz-container">
+      <div class="quiz-header">
+       <h2 id="quiz-title">Advanced Assessment Quiz</h2>
+      </div>
+      <div id="quiz-start" class="quiz-start-screen">
+       <h3>Test Your 3D Geometry Mastery</h3>
+       <div class="quiz-features">
+        <div class="feature-box">
+         <div class="feature-icon">
+          📝
+         </div>
+         <div class="feature-text">
+          15 Challenging Questions
+         </div>
+        </div>
+        <div class="feature-box">
+         <div class="feature-icon">
+          🎓
+         </div>
+         <div class="feature-text">
+          Grade 10 Level Content
+         </div>
+        </div>
+        <div class="feature-box">
+         <div class="feature-icon">
+          ⚡
+         </div>
+         <div class="feature-text">
+          Mixed Difficulty Levels
+         </div>
+        </div>
+        <div class="feature-box">
+         <div class="feature-icon">
+          💡
+         </div>
+         <div class="feature-text">
+          Detailed Explanations
+         </div>
+        </div>
+       </div><button class="start-quiz-btn" id="start-quiz-btn">Start Assessment</button>
+      </div>
+      <div id="quiz-content" style="display: none;">
+       <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="progress-fill"></div>
+       </div>
+       <div class="quiz-info-bar">
+        <div class="question-counter" id="question-counter"></div>
+        <div id="difficulty-badge" class="difficulty-badge"></div>
+        <div class="score-display" id="score-display">
+         Score: 0/15
+        </div>
+       </div>
+       <div class="question-card">
+        <div class="question-text" id="question-text"></div>
+        <div class="question-context" id="question-context"></div>
+       </div>
+       <div class="options-grid" id="options-grid"></div>
+       <div class="feedback-box empty" id="feedback-box"></div>
+       <div class="quiz-actions"><button class="quiz-btn" id="submit-btn">Submit Answer</button> <button class="quiz-btn" id="next-btn" style="display: none;">Next Question</button>
+       </div>
+      </div>
+      <div id="quiz-results" style="display: none;"></div>
+     </div>
+    </div>
+   </div>
+  </main>
+  <script>
+    const defaultConfig = {
+      app_title: "Advanced 3D Geometry",
+      subtitle: "Master Grade 10 concepts: Volume, Surface Area, and Spatial Reasoning",
+      cube_label: "Cube",
+      sphere_label: "Sphere",
+      cylinder_label: "Cylinder",
+      cone_label: "Cone",
+      pyramid_label: "Square Pyramid",
+      prism_label: "Triangular Prism",
+      hemisphere_label: "Hemisphere",
+      rectangular_prism_label: "Rectangular Prism",
+      quiz_title: "Advanced Assessment Quiz",
+      start_quiz_button: "Start Assessment",
+      next_button: "Next Question",
+      submit_button: "Submit Answer",
+      restart_button: "Restart Quiz",
+      calculator_title: "3D Shape Calculator",
+      calculate_button: "Calculate",
+      background_color: "#0f172a",
+      surface_color: "#ffffff",
+      text_color: "#1e293b",
+      accent_color: "#667eea",
+      button_color: "#10b981",
+      font_family: "SF Pro Display",
+      font_size: 16
+    };
+
+    const shapes = [
+      {
+        id: 'cube',
+        configKey: 'cube_label',
+        faces: 6,
+        vertices: 8,
+        edges: 12,
+        volumeFormula: 'V = s³',
+        surfaceAreaFormula: 'SA = 6s²',
+        keyFact: 'All faces are congruent squares. Each vertex connects 3 edges.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><g class="rotating"><rect x="35" y="75" width="65" height="65" fill="#60a5fa" stroke="#1e40af" stroke-width="4"/><path d="M100,75 L135,40 L135,105 L100,140 Z" fill="#3b82f6" stroke="#1e40af" stroke-width="4"/><path d="M35,75 L70,40 L135,40 L100,75 Z" fill="#93c5fd" stroke="#1e40af" stroke-width="4"/></g></svg>',
+        calcInputs: [{name: 'side', label: 'Side Length (s)', unit: 'units'}],
+        calcVolume: (vals) => Math.pow(vals.side, 3),
+        calcSA: (vals) => 6 * Math.pow(vals.side, 2)
+      },
+      {
+        id: 'sphere',
+        configKey: 'sphere_label',
+        faces: 1,
+        vertices: 0,
+        edges: 0,
+        volumeFormula: 'V = (4/3)πr³',
+        surfaceAreaFormula: 'SA = 4πr²',
+        keyFact: 'Every point on surface is equidistant from center. Perfect 3D symmetry.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><radialGradient id="sg"><stop offset="25%" stop-color="#fb923c"/><stop offset="100%" stop-color="#ea580c"/></radialGradient></defs><g class="rotating"><circle cx="100" cy="100" r="70" fill="url(#sg)" stroke="#9a3412" stroke-width="4"/><ellipse cx="100" cy="100" rx="70" ry="22" fill="none" stroke="#9a3412" stroke-width="2.5" opacity="0.6"/><ellipse cx="100" cy="100" rx="22" ry="70" fill="none" stroke="#9a3412" stroke-width="2.5" opacity="0.6"/></g></svg>',
+        calcInputs: [{name: 'radius', label: 'Radius (r)', unit: 'units'}],
+        calcVolume: (vals) => (4/3) * Math.PI * Math.pow(vals.radius, 3),
+        calcSA: (vals) => 4 * Math.PI * Math.pow(vals.radius, 2)
+      },
+      {
+        id: 'cylinder',
+        configKey: 'cylinder_label',
+        faces: 3,
+        vertices: 0,
+        edges: 2,
+        volumeFormula: 'V = πr²h',
+        surfaceAreaFormula: 'SA = 2πr² + 2πrh',
+        keyFact: 'Two parallel circular bases. Lateral surface unrolls into a rectangle.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><linearGradient id="cg" x1="0%" x2="100%"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs><g class="rotating"><ellipse cx="100" cy="50" rx="60" ry="20" fill="#6ee7b7" stroke="#047857" stroke-width="4"/><rect x="40" y="50" width="120" height="95" fill="url(#cg)"/><line x1="40" y1="50" x2="40" y2="145" stroke="#047857" stroke-width="4"/><line x1="160" y1="50" x2="160" y2="145" stroke="#047857" stroke-width="4"/><ellipse cx="100" cy="145" rx="60" ry="20" fill="#34d399" stroke="#047857" stroke-width="4"/></g></svg>',
+        calcInputs: [
+          {name: 'radius', label: 'Radius (r)', unit: 'units'},
+          {name: 'height', label: 'Height (h)', unit: 'units'}
+        ],
+        calcVolume: (vals) => Math.PI * Math.pow(vals.radius, 2) * vals.height,
+        calcSA: (vals) => 2 * Math.PI * Math.pow(vals.radius, 2) + 2 * Math.PI * vals.radius * vals.height
+      },
+      {
+        id: 'cone',
+        configKey: 'cone_label',
+        faces: 2,
+        vertices: 1,
+        edges: 1,
+        volumeFormula: 'V = (1/3)πr²h',
+        surfaceAreaFormula: 'SA = πr² + πrl',
+        keyFact: 'Volume is exactly 1/3 of cylinder with same base and height.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><linearGradient id="cong" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></radialGradient></defs><g class="rotating"><ellipse cx="100" cy="160" rx="70" ry="22" fill="#fcd34d" stroke="#b45309" stroke-width="4"/><path d="M30,160 L100,30 L170,160" fill="url(#cong)" stroke="#b45309" stroke-width="4"/></g></svg>',
+        calcInputs: [
+          {name: 'radius', label: 'Radius (r)', unit: 'units'},
+          {name: 'height', label: 'Height (h)', unit: 'units'},
+          {name: 'slant', label: 'Slant Height (l)', unit: 'units'}
+        ],
+        calcVolume: (vals) => (1/3) * Math.PI * Math.pow(vals.radius, 2) * vals.height,
+        calcSA: (vals) => Math.PI * Math.pow(vals.radius, 2) + Math.PI * vals.radius * vals.slant
+      },
+      {
+        id: 'pyramid',
+        configKey: 'pyramid_label',
+        faces: 5,
+        vertices: 5,
+        edges: 8,
+        volumeFormula: 'V = (1/3)s²h',
+        surfaceAreaFormula: 'SA = s² + 2sl',
+        keyFact: 'Square base with 4 triangular faces meeting at apex vertex.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#9333ea"/></linearGradient></defs><g class="rotating"><path d="M100,30 L30,160 L170,160 Z" fill="url(#pg)" stroke="#6b21a8" stroke-width="4"/><path d="M100,30 L170,160 L145,172 Z" fill="#a855f7" stroke="#6b21a8" stroke-width="4"/><path d="M30,160 L170,160 L145,172 L55,172 Z" fill="#d8b4fe" stroke="#6b21a8" stroke-width="4"/></g></svg>',
+        calcInputs: [
+          {name: 'base', label: 'Base Side (s)', unit: 'units'},
+          {name: 'height', label: 'Height (h)', unit: 'units'},
+          {name: 'slant', label: 'Slant Height (l)', unit: 'units'}
+        ],
+        calcVolume: (vals) => (1/3) * Math.pow(vals.base, 2) * vals.height,
+        calcSA: (vals) => Math.pow(vals.base, 2) + 2 * vals.base * vals.slant
+      },
+      {
+        id: 'prism',
+        configKey: 'prism_label',
+        faces: 5,
+        vertices: 6,
+        edges: 9,
+        volumeFormula: 'V = (1/2)bhl',
+        surfaceAreaFormula: 'SA = bh + 2ls + lb',
+        keyFact: 'Two triangular bases connected by 3 rectangular faces.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><linearGradient id="prg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><g class="rotating"><path d="M45,145 L100,55 L155,145 Z" fill="#fbcfe8" stroke="#9f1239" stroke-width="4"/><path d="M45,145 L100,55 L100,155 Z" fill="url(#prg)" stroke="#9f1239" stroke-width="4"/><path d="M100,55 L155,145 L100,155 Z" fill="#f472b6" stroke="#9f1239" stroke-width="4"/><path d="M45,145 L100,155 L155,145 Z" fill="#fda4af" stroke="#9f1239" stroke-width="4"/></g></svg>',
+        calcInputs: [
+          {name: 'base', label: 'Triangle Base (b)', unit: 'units'},
+          {name: 'height', label: 'Triangle Height (h)', unit: 'units'},
+          {name: 'length', label: 'Prism Length (l)', unit: 'units'}
+        ],
+        calcVolume: (vals) => 0.5 * vals.base * vals.height * vals.length,
+        calcSA: (vals) => {
+          const s = Math.sqrt(Math.pow(vals.base/2, 2) + Math.pow(vals.height, 2)) * 2;
+          return vals.base * vals.height + 2 * vals.length * s + vals.length * vals.base;
+        }
+      },
+      {
+        id: 'hemisphere',
+        configKey: 'hemisphere_label',
+        faces: 2,
+        vertices: 0,
+        edges: 1,
+        volumeFormula: 'V = (2/3)πr³',
+        surfaceAreaFormula: 'SA = 3πr²',
+        keyFact: 'Exactly half a sphere. Surface includes curved area + circular base.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><defs><radialGradient id="hg"><stop offset="20%" stop-color="#818cf8"/><stop offset="100%" stop-color="#4f46e5"/></radialGradient></defs><g class="rotating"><path d="M30,120 Q100,40 170,120" fill="url(#hg)" stroke="#3730a3" stroke-width="4"/><ellipse cx="100" cy="120" rx="70" ry="20" fill="#6366f1" stroke="#3730a3" stroke-width="4"/></g></svg>',
+        calcInputs: [{name: 'radius', label: 'Radius (r)', unit: 'units'}],
+        calcVolume: (vals) => (2/3) * Math.PI * Math.pow(vals.radius, 3),
+        calcSA: (vals) => 3 * Math.PI * Math.pow(vals.radius, 2)
+      },
+      {
+        id: 'rectangular',
+        configKey: 'rectangular_prism_label',
+        faces: 6,
+        vertices: 8,
+        edges: 12,
+        volumeFormula: 'V = lwh',
+        surfaceAreaFormula: 'SA = 2(lw + lh + wh)',
+        keyFact: 'All faces are rectangles. Opposite faces are congruent.',
+        svg: '<svg viewBox="0 0 200 200" width="170" height="170"><g class="rotating"><rect x="30" y="75" width="80" height="60" fill="#a78bfa" stroke="#5b21b6" stroke-width="4"/><path d="M110,75 L150,45 L150,105 L110,135 Z" fill="#8b5cf6" stroke="#5b21b6" stroke-width="4"/><path d="M30,75 L70,45 L150,45 L110,75 Z" fill="#c4b5fd" stroke="#5b21b6" stroke-width="4"/></g></svg>',
+        calcInputs: [
+          {name: 'length', label: 'Length (l)', unit: 'units'},
+          {name: 'width', label: 'Width (w)', unit: 'units'},
+          {name: 'height', label: 'Height (h)', unit: 'units'}
+        ],
+        calcVolume: (vals) => vals.length * vals.width * vals.height,
+        calcSA: (vals) => 2 * (vals.length * vals.width + vals.length * vals.height + vals.width * vals.height)
+      }
+    ];
+
+    const quizQuestions = [
+      {
+        question: "A cube has a total surface area of 294 cm². What is the length of one edge?",
+        options: ["6 cm", "7 cm", "8 cm", "9 cm"],
+        correct: 1,
+        difficulty: "medium",
+        explanation: "SA = 6s², so 294 = 6s². Therefore s² = 49, and s = 7 cm.",
+        context: "Use the surface area formula and work backwards"
+      },
+      {
+        question: "A sphere and a cylinder have the same radius of 5 cm. If they also have the same volume, what is the height of the cylinder?",
+        options: ["5 cm", "6.67 cm", "10 cm", "15 cm"],
+        correct: 1,
+        difficulty: "hard",
+        explanation: "Sphere volume: (4/3)π(5³) = 523.6 cm³. Cylinder: πr²h = π(25)h. Solving: h = 523.6/(25π) ≈ 6.67 cm.",
+        context: "This tests understanding of volume relationships"
+      },
+      {
+        question: "What is the volume of a cone with radius 6 cm and height 9 cm? (Use π ≈ 3.14)",
+        options: ["226.08 cm³", "339.12 cm³", "452.16 cm³", "678.24 cm³"],
+        correct: 1,
+        difficulty: "easy",
+        explanation: "V = (1/3)πr²h = (1/3) × 3.14 × 36 × 9 = 339.12 cm³.",
+        context: "Apply the cone volume formula"
+      },
+      {
+        question: "If the radius of a sphere is doubled, by what factor does its volume increase?",
+        options: ["2 times", "4 times", "6 times", "8 times"],
+        correct: 3,
+        difficulty: "medium",
+        explanation: "V = (4/3)πr³. If r becomes 2r, then V becomes (4/3)π(2r)³ = 8 × (4/3)πr³. Volume increases 8 times.",
+        context: "Understanding cubic relationships"
+      },
+      {
+        question: "A rectangular prism has dimensions 4 cm × 5 cm × 10 cm. What is its surface area?",
+        options: ["160 cm²", "180 cm²", "200 cm²", "220 cm²"],
+        correct: 3,
+        difficulty: "easy",
+        explanation: "SA = 2(lw + lh + wh) = 2(20 + 40 + 50) = 2(110) = 220 cm².",
+        context: "Calculate total surface area"
+      },
+      {
+        question: "How many times greater is the volume of a cylinder compared to a cone with the same base and height?",
+        options: ["2 times", "3 times", "4 times", "6 times"],
+        correct: 1,
+        difficulty: "easy",
+        explanation: "Cylinder V = πr²h. Cone V = (1/3)πr²h. The cylinder volume is exactly 3 times the cone volume.",
+        context: "Fundamental volume relationship"
+      },
+      {
+        question: "A hemisphere has a radius of 9 cm. What is its total surface area including the base? (Use π ≈ 3.14)",
+        options: ["508.68 cm²", "635.85 cm²", "763.02 cm²", "890.19 cm²"],
+        correct: 2,
+        difficulty: "medium",
+        explanation: "SA = 3πr² = 3 × 3.14 × 81 = 763.02 cm².",
+        context: "Remember to include the circular base"
+      },
+      {
+        question: "A square pyramid has a base edge of 12 cm and a slant height of 10 cm. What is its surface area?",
+        options: ["240 cm²", "288 cm²", "324 cm²", "384 cm²"],
+        correct: 3,
+        difficulty: "medium",
+        explanation: "SA = s² + 2sl = 144 + 2(12)(10) = 144 + 240 = 384 cm².",
+        context: "Base area plus four triangular faces"
+      },
+      {
+        question: "If a cube's edge length is tripled, how many times greater does its volume become?",
+        options: ["3 times", "9 times", "18 times", "27 times"],
+        correct: 3,
+        difficulty: "medium",
+        explanation: "V = s³. If s becomes 3s, then V becomes (3s)³ = 27s³. Volume increases 27 times.",
+        context: "Scaling in three dimensions"
+      },
+      {
+        question: "A cylindrical tank has radius 7 cm and height 20 cm. How much water can it hold? (Use π ≈ 3.14)",
+        options: ["2,461.76 cm³", "3,077.2 cm³", "3,692.64 cm³", "4,308.08 cm³"],
+        correct: 1,
+        difficulty: "easy",
+        explanation: "V = πr²h = 3.14 × 49 × 20 = 3,077.2 cm³.",
+        context: "Practical application of cylinder volume"
+      },
+      {
+        question: "Which shape has the greatest volume-to-surface-area ratio?",
+        options: ["Cube", "Sphere", "Cylinder", "Cone"],
+        correct: 1,
+        difficulty: "hard",
+        explanation: "A sphere has the maximum volume for a given surface area compared to all other shapes - this is why bubbles are spherical.",
+        context: "Advanced geometric principle"
+      },
+      {
+        question: "A cone has volume 150 cm³ and radius 5 cm. What is its height? (Use π ≈ 3.14)",
+        options: ["4.78 cm", "5.73 cm", "6.89 cm", "7.96 cm"],
+        correct: 1,
+        difficulty: "hard",
+        explanation: "V = (1/3)πr²h. So 150 = (1/3)(3.14)(25)h. Solving: h = 450/(78.5) ≈ 5.73 cm.",
+        context: "Work backwards from volume"
+      },
+      {
+        question: "A triangular prism has a triangular base with base 8 cm and height 6 cm. If the prism length is 15 cm, what is its volume?",
+        options: ["180 cm³", "240 cm³", "360 cm³", "720 cm³"],
+        correct: 2,
+        difficulty: "medium",
+        explanation: "V = (1/2)bhl = (1/2) × 8 × 6 × 15 = 360 cm³.",
+        context: "Triangular prism volume calculation"
+      },
+      {
+        question: "If the height of a cylinder is doubled while the radius stays the same, what happens to its volume?",
+        options: ["Stays the same", "Doubles", "Triples", "Quadruples"],
+        correct: 1,
+        difficulty: "easy",
+        explanation: "V = πr²h. If h doubles to 2h, then V becomes πr²(2h) = 2πr²h. Volume doubles.",
+        context: "Linear relationship with height"
+      },
+      {
+        question: "A cube and a sphere have the same volume. If the cube has edge length 10 cm, what is the approximate radius of the sphere?",
+        options: ["5.42 cm", "6.20 cm", "7.81 cm", "8.95 cm"],
+        correct: 1,
+        difficulty: "hard",
+        explanation: "Cube V = 1000 cm³. Sphere: (4/3)πr³ = 1000. Solving: r³ = 750/π ≈ 238.73, so r ≈ 6.20 cm.",
+        context: "Comparing volumes across shapes"
+      }
+    ];
+
+    let currentTab = 'shapes';
+    let currentQuestion = 0;
+    let score = 0;
+    let quizStarted = false;
+    let answered = false;
+    let selectedAnswer = null;
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`${tab}-tab`).classList.add('active');
+    }
+
+    function renderShapes() {
+      const grid = document.getElementById('shapes-grid');
+      grid.innerHTML = '';
+      
+      shapes.forEach(shape => {
+        const card = document.createElement('div');
+        card.className = 'shape-card';
+        
+        const shapeName = window.elementSdk.config[shape.configKey] || defaultConfig[shape.configKey];
+        
+        card.innerHTML = `
+          <div class="shape-visual">${shape.svg}</div>
+          <div class="shape-name">${shapeName}</div>
+          
+          <div class="properties-grid">
+            <div class="property-box">
+              <div class="property-label">Faces</div>
+              <div class="property-value">${shape.faces}</div>
+            </div>
+            <div class="property-box">
+              <div class="property-label">Vertices</div>
+              <div class="property-value">${shape.vertices}</div>
+            </div>
+            <div class="property-box">
+              <div class="property-label">Edges</div>
+              <div class="property-value">${shape.edges}</div>
+            </div>
+          </div>
+          
+          <div class="formulas-section">
+            <div class="formula-title">📐 Formulas</div>
+            <div class="formula-item">
+              <span class="formula-label">Volume:</span> ${shape.volumeFormula}
+            </div>
+            <div class="formula-item">
+              <span class="formula-label">Surface Area:</span> ${shape.surfaceAreaFormula}
+            </div>
+          </div>
+          
+          <div class="key-fact">
+            💡 <strong>Key Fact:</strong> ${shape.keyFact}
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+
+    function setupCalculator() {
+      const shapeSelect = document.getElementById('calc-shape');
+      shapeSelect.addEventListener('change', (e) => {
+        const shapeId = e.target.value;
+        const shape = shapes.find(s => s.id === shapeId);
+        const inputsContainer = document.getElementById('calc-inputs');
+        
+        if (!shape) {
+          inputsContainer.innerHTML = '';
+          return;
+        }
+        
+        inputsContainer.innerHTML = shape.calcInputs.map(input => `
+          <div class="form-group">
+            <label class="form-label">${input.label}</label>
+            <input type="number" class="form-input" id="calc-${input.name}" placeholder="Enter ${input.unit}" step="0.01" min="0">
+          </div>
+        `).join('');
+      });
+      
+      document.getElementById('calculate-btn').addEventListener('click', calculateResults);
+    }
+
+    function calculateResults() {
+      const shapeId = document.getElementById('calc-shape').value;
+      const shape = shapes.find(s => s.id === shapeId);
+      const resultDiv = document.getElementById('calc-result');
+      
+      if (!shape) {
+        resultDiv.textContent = 'Please select a shape first';
+        return;
+      }
+      
+      const values = {};
+      let allValid = true;
+      
+      shape.calcInputs.forEach(input => {
+        const val = parseFloat(document.getElementById(`calc-${input.name}`).value);
+        if (isNaN(val) || val <= 0) {
+          allValid = false;
+        }
+        values[input.name] = val;
+      });
+      
+      if (!allValid) {
+        resultDiv.textContent = 'Please enter valid positive numbers for all dimensions';
+        return;
+      }
+      
+      const volume = shape.calcVolume(values);
+      const surfaceArea = shape.calcSA(values);
+      
+      resultDiv.innerHTML = `
+        <div style="text-align: center;">
+          <div style="font-size: 18px; color: #64748b; margin-bottom: 15px;">Results for ${window.elementSdk.config[shape.configKey] || defaultConfig[shape.configKey]}</div>
+          <div style="font-size: 24px; font-weight: 800; color: #667eea; margin: 10px 0;">
+            Volume: ${volume.toFixed(2)} cubic units
+          </div>
+          <div style="font-size: 24px; font-weight: 800; color: #10b981; margin: 10px 0;">
+            Surface Area: ${surfaceArea.toFixed(2)} square units
+          </div>
+        </div>
+      `;
+    }
+
+    function startQuiz() {
+      quizStarted = true;
+      currentQuestion = 0;
+      score = 0;
+      answered = false;
+      selectedAnswer = null;
+      
+      document.getElementById('quiz-start').style.display = 'none';
+      document.getElementById('quiz-content').style.display = 'block';
+      
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const question = quizQuestions[currentQuestion];
+      
+      document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+      document.getElementById('score-display').textContent = `Score: ${score}/${quizQuestions.length}`;
+      
+      const difficultyBadge = document.getElementById('difficulty-badge');
+      difficultyBadge.textContent = question.difficulty;
+      difficultyBadge.className = `difficulty-badge difficulty-${question.difficulty}`;
+      
+      const progress = ((currentQuestion) / quizQuestions.length) * 100;
+      document.getElementById('progress-fill').style.width = `${progress}%`;
+      
+      document.getElementById('question-text').textContent = question.question;
+      document.getElementById('question-context').textContent = question.context;
+      
+      const optionsGrid = document.getElementById('options-grid');
+      optionsGrid.innerHTML = '';
+      
+      const letters = ['A', 'B', 'C', 'D'];
+      question.options.forEach((option, index) => {
+        const optionCard = document.createElement('div');
+        optionCard.className = 'option-card';
+        optionCard.innerHTML = `
+          <div class="option-letter">${letters[index]}</div>
+          <div>${option}</div>
+        `;
+        optionCard.onclick = () => selectOption(index);
+        optionsGrid.appendChild(optionCard);
+      });
+      
+      document.getElementById('feedback-box').textContent = '';
+      document.getElementById('feedback-box').className = 'feedback-box empty';
+      document.getElementById('submit-btn').style.display = 'inline-block';
+      document.getElementById('next-btn').style.display = 'none';
+      document.getElementById('submit-btn').disabled = true;
+      
+      answered = false;
+      selectedAnswer = null;
+    }
+
+    function selectOption(index) {
+      if (answered) return;
+      
+      selectedAnswer = index;
+      
+      document.querySelectorAll('.option-card').forEach((card, i) => {
+        card.classList.remove('selected');
+        if (i === index) {
+          card.style.borderColor = '#667eea';
+          card.style.background = '#f1f5f9';
+        } else {
+          card.style.borderColor = '#e2e8f0';
+          card.style.background = 'white';
+        }
+      });
+      
+      document.getElementById('submit-btn').disabled = false;
+    }
+
+    function submitAnswer() {
+      if (answered || selectedAnswer === null) return;
+      
+      answered = true;
+      const question = quizQuestions[currentQuestion];
+      const options = document.querySelectorAll('.option-card');
+      const feedback = document.getElementById('feedback-box');
+      
+      options.forEach(opt => {
+        opt.classList.add('disabled');
+        opt.onclick = null;
+      });
+      
+      if (selectedAnswer === question.correct) {
+        options[selectedAnswer].classList.add('correct');
+        feedback.innerHTML = `<div>✅ <strong>Excellent!</strong> ${question.explanation}</div>`;
+        feedback.className = 'feedback-box correct';
+        score++;
+      } else {
+        options[selectedAnswer].classList.add('incorrect');
+        options[question.correct].classList.add('correct');
+        feedback.innerHTML = `<div>❌ <strong>Not quite.</strong> ${question.explanation}</div>`;
+        feedback.className = 'feedback-box incorrect';
+      }
+      
+      document.getElementById('submit-btn').style.display = 'none';
+      document.getElementById('next-btn').style.display = 'inline-block';
+      document.getElementById('score-display').textContent = `Score: ${score}/${quizQuestions.length}`;
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      
+      if (currentQuestion >= quizQuestions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('quiz-content').style.display = 'none';
+      
+      const percentage = Math.round((score / quizQuestions.length) * 100);
+      let emoji = '';
+      let message = '';
+      let performance = '';
+      
+      if (percentage >= 95) {
+        emoji = '🏆';
+        message = 'Perfect Mastery!';
+        performance = 'You have exceptional understanding of 3D geometry!';
+      } else if (percentage >= 85) {
+        emoji = '🌟';
+        message = 'Outstanding Performance!';
+        performance = 'You have mastered Grade 10 3D shapes concepts!';
+      } else if (percentage >= 75) {
+        emoji = '⭐';
+        message = 'Great Job!';
+        performance = 'You have strong understanding with room to excel!';
+      } else if (percentage >= 60) {
+        emoji = '📚';
+        message = 'Good Effort!';
+        performance = 'Review the study guide and practice more problems.';
+      } else {
+        emoji = '💪';
+        message = 'Keep Learning!';
+        performance = 'Study the formulas and try the calculator tool for practice.';
+      }
+      
+      const resultsDiv = document.getElementById('quiz-results');
+      resultsDiv.style.display = 'block';
+      resultsDiv.innerHTML = `
+        <div class="results-screen">
+          <div class="results-emoji">${emoji}</div>
+          <div class="results-score">${percentage}%</div>
+          <div class="results-message">${message}</div>
+          <p style="font-size: 20px; color: #64748b; margin: 20px 0; font-weight: 500;">${performance}</p>
+          
+          <div class="results-stats">
+            <div class="stat-box">
+              <div class="stat-value">${score}</div>
+              <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${quizQuestions.length - score}</div>
+              <div class="stat-label">Incorrect</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${quizQuestions.length}</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${percentage}%</div>
+              <div class="stat-label">Score</div>
+            </div>
+          </div>
+          
+          <button class="quiz-btn secondary" onclick="restartQuiz()" id="restart-quiz-btn">
+            ${window.elementSdk.config.restart_button || defaultConfig.restart_button}
+          </button>
+        </div>
+      `;
+    }
+
+    function restartQuiz() {
+      quizStarted = false;
+      currentQuestion = 0;
+      score = 0;
+      answered = false;
+      selectedAnswer = null;
+      
+      document.getElementById('quiz-start').style.display = 'block';
+      document.getElementById('quiz-content').style.display = 'none';
+      document.getElementById('quiz-results').style.display = 'none';
+    }
+
+    async function onConfigChange(config) {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, sans-serif';
+      
+      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, #1e293b 25%, #334155 50%, ${config.accent_color || defaultConfig.accent_color} 100%)`;
+      
+      document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+      document.getElementById('app-title').style.fontSize = `${baseSize * 4}px`;
+      
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('subtitle').style.fontSize = `${baseSize * 1.5}px`;
+      
+      document.getElementById('calculator-title').textContent = config.calculator_title || defaultConfig.calculator_title;
+      document.getElementById('calculator-title').style.fontSize = `${baseSize * 2.625}px`;
+      document.getElementById('calculator-title').style.color = config.text_color || defaultConfig.text_color;
+      
+      document.getElementById('calculate-btn').textContent = config.calculate_button || defaultConfig.calculate_button;
+      document.getElementById('calculate-btn').style.fontSize = `${baseSize * 1.25}px`;
+      
+      document.getElementById('quiz-title').textContent = config.quiz_title || defaultConfig.quiz_title;
+      document.getElementById('quiz-title').style.fontSize = `${baseSize * 3}px`;
+      document.getElementById('quiz-title').style.color = config.text_color || defaultConfig.text_color;
+      
+      document.getElementById('start-quiz-btn').textContent = config.start_quiz_button || defaultConfig.start_quiz_button;
+      document.getElementById('start-quiz-btn').style.fontSize = `${baseSize * 1.5}px`;
+      
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.textContent = config.submit_button || defaultConfig.submit_button;
+      submitBtn.style.fontSize = `${baseSize * 1.25}px`;
+      
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = config.next_button || defaultConfig.next_button;
+      nextBtn.style.fontSize = `${baseSize * 1.25}px`;
+      
+      document.querySelectorAll('.shape-card').forEach(el => {
+        el.style.background = `rgba(${hexToRgb(config.surface_color || defaultConfig.surface_color)}, 0.95)`;
+      });
+      
+      document.querySelectorAll('.shape-name').forEach(el => {
+        el.style.fontSize = `${baseSize * 2}px`;
+        el.style.color = config.text_color || defaultConfig.text_color;
+      });
+      
+      document.querySelectorAll('.property-value').forEach(el => {
+        el.style.color = config.accent_color || defaultConfig.accent_color;
+      });
+      
+      document.querySelectorAll('.formula-label').forEach(el => {
+        el.style.color = config.accent_color || defaultConfig.accent_color;
+      });
+      
+      document.querySelector('.calculator-container').style.background = `rgba(${hexToRgb(config.surface_color || defaultConfig.surface_color)}, 0.95)`;
+      document.querySelector('.quiz-container').style.background = `rgba(${hexToRgb(config.surface_color || defaultConfig.surface_color)}, 0.95)`;
+      
+      renderShapes();
+    }
+
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 255, 255';
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange,
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          },
+          {
+            get: () => config.button_color || defaultConfig.button_color,
+            set: (value) => {
+              config.button_color = value;
+              window.elementSdk.setConfig({ button_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["app_title", config.app_title || defaultConfig.app_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["cube_label", config.cube_label || defaultConfig.cube_label],
+        ["sphere_label", config.sphere_label || defaultConfig.sphere_label],
+        ["cylinder_label", config.cylinder_label || defaultConfig.cylinder_label],
+        ["cone_label", config.cone_label || defaultConfig.cone_label],
+        ["pyramid_label", config.pyramid_label || defaultConfig.pyramid_label],
+        ["prism_label", config.prism_label || defaultConfig.prism_label],
+        ["hemisphere_label", config.hemisphere_label || defaultConfig.hemisphere_label],
+        ["rectangular_prism_label", config.rectangular_prism_label || defaultConfig.rectangular_prism_label],
+        ["quiz_title", config.quiz_title || defaultConfig.quiz_title],
+        ["start_quiz_button", config.start_quiz_button || defaultConfig.start_quiz_button],
+        ["next_button", config.next_button || defaultConfig.next_button],
+        ["submit_button", config.submit_button || defaultConfig.submit_button],
+        ["restart_button", config.restart_button || defaultConfig.restart_button],
+        ["calculator_title", config.calculator_title || defaultConfig.calculator_title],
+        ["calculate_button", config.calculate_button || defaultConfig.calculate_button]
+      ])
+    });
+
+    document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+    document.getElementById('submit-btn').addEventListener('click', submitAnswer);
+    document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+    renderShapes();
+    setupCalculator();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a4e811470f39e1e',t:'MTc2NDIxMzc3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
